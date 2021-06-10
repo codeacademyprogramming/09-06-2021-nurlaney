@@ -21,6 +21,7 @@ const url = process.env.MONGO_KEY || "";
 mongoose.connect(url, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useCreateIndex: true,
 });
 
 const db = mongoose.connection;

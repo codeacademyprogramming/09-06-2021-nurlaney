@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { IRegisterPayload } from "../interfaces/auth";
 import * as yup from "yup";
+import UserModel from "../models/user";
 
 export const AuthRouter = Router();
 
@@ -11,8 +12,14 @@ let registerPayloadSchema = yup.object().shape({
 
 AuthRouter.post("/register", async (req, res) => {
   const registerPayload: IRegisterPayload = req.body;
-  const isPayloadValid = await registerPayloadSchema.isValid(registerPayload);
-  res.json(registerPayload);
+  try {
+    const isPayloadValid = await registerPayloadSchema.isValid(registerPayload);
+    let newUser = new UserModel(isPayloadValid);
+    newUser = await newUser.save();
+    res.json({ isPayloadValid });
+  } catch (err) {
+    res.status(422).json({ errors: err.errors });
+  }
 });
 
 AuthRouter.post("/login", (req, res) =>
